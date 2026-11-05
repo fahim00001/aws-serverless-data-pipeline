@@ -160,15 +160,15 @@ The function retrieves user records from the JSONPlaceholder REST API and stores
 
 **Lambda Configuration**
 
-| Configuration | Value |
-|---|---|
-| Function name | `lambda-import-users` |
-| Runtime | Python 3.13 |
-| Architecture | ARM64 |
-| Handler | `lambda_function.lambda_handler` |
-| Execution role | `lambda-import-users-role` |
+| Configuration        | Value                              |
+| -------------------- | ---------------------------------- |
+| Function name        | `lambda-import-users`              |
+| Runtime              | Python 3.13                        |
+| Architecture         | ARM64                              |
+| Handler              | `lambda_function.lambda_handler`   |
+| Execution role       | `lambda-import-users-role`         |
 | Environment variable | `TABLE_NAME=jsonplaceholder-users` |
-| Memory | 128 MB |
+| Memory               | 128 MB                             |
 
 **Execution Process**
 
@@ -182,26 +182,65 @@ The function retrieves user records from the JSONPlaceholder REST API and stores
 
 The first test invocation completed successfully.
 
-| Metric | Result |
-|---|---|
-| Execution status | Succeeded |
-| Response status code | 200 |
-| Records saved | 10 |
-| Execution duration | 954.41 ms |
-| Maximum memory used | 93 MB |
+| Metric               | Result    |
+| -------------------- | --------- |
+| Execution status     | Succeeded |
+| Response status code | 200       |
+| Records saved        | 10        |
+| Execution duration   | 954.41 ms |
+| Maximum memory used  | 93 MB     |
 
-![Successful Lambda execution and response](docs/implementation-screenshots/06-import-lambda-success.png)
+![Successful Lambda execution and response](docs/implementation-screenshots/05-import-lambda-success.png)
 
 **DynamoDB Data Verification**
 
 After execution, I scanned the `jsonplaceholder-users` table and verified that all 10 user records were present.
 
-| Verification | Result |
-|---|---|
-| Items returned | 10 |
-| Items scanned | 10 |
-| Scan efficiency | 100% |
+| Verification           | Result |
+| ---------------------- | ------ |
+| Items returned         | 10     |
+| Items scanned          | 10     |
+| Scan efficiency        | 100%   |
 | Read capacity consumed | 2 RCUs |
 
-![Imported user records in DynamoDB](docs/implementation-screenshots/07-dynamodb-imported-users.png)
+![Imported user records in DynamoDB](docs/implementation-screenshots/06-dynamodb-imported-users.png)
 
+### 6.5 DynamoDB JSON Export to Amazon S3
+
+I deployed `lambda-backup-to-s3` to read user records from DynamoDB and export them as a JSON file to S3.
+
+The function handles paginated DynamoDB scans and converts DynamoDB Decimal values into JSON-compatible values. Each filename includes a UTC timestamp and the Lambda request ID to distinguish separate executions.
+
+**Configuration**
+
+| Setting         | Value                              |
+| --------------- | ---------------------------------- |
+| Lambda function | `lambda-backup-to-s3`              |
+| Execution role  | `lambda-backup-export-role`        |
+| DynamoDB table  | `jsonplaceholder-users`            |
+| S3 bucket       | `jsonplaceholder-backup-2026-8472` |
+| Export prefix   | `backups/`                         |
+| AWS Region      | `us-west-2`                        |
+
+The execution role has `AWSLambdaBasicExecutionRole` for logging. Its inline policy, `lambda-backup-export-policy`, allows `dynamodb:Scan` on the users table and `s3:PutObject` only under the bucket’s `backups/` prefix.
+
+**Manual Test Results**
+
+I manually invoked the backup function from the Lambda console. The response and execution logs reported a successful export of 10 records.
+
+| Result             | Observed value                         |
+| ------------------ | -------------------------------------- |
+| Status code        | `200`                                  |
+| Records exported   | 10                                     |
+| Scan pages         | 1                                      |
+| Execution duration | 531.14 ms                              |
+| S3 object size     | 5.5 KB                                 |
+| S3 last modified   | November 5, 2026, 22:34:54 (UTC+06:00) |
+
+![Successful manual backup Lambda test](docs/implementation-screenshots/07-backup-lambda-test.png)
+
+**S3 Verification**
+
+I confirmed that the JSON object appeared under `backups/2026-11-05/`. Its filename matches the object path reported by the Lambda execution.
+
+![JSON export stored in Amazon S3](docs/implementation-screenshots/08-backup-s3-object.png)
