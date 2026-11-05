@@ -152,4 +152,56 @@ The inline policy restricts DynamoDB writes to the `jsonplaceholder-users` table
 
 **DynamoDB Policy Screenshot**
 
-![Inline policy allowing PutItem on the users table](docs/implementation-screenshots/05-lambda-import-policy.png)
+### 6.4 Import Lambda Deployment and DynamoDB Data Insertion
+
+After configuring the IAM execution role, I created and deployed the `lambda-import-users` function using Python 3.13.
+
+The function retrieves user records from the JSONPlaceholder REST API and stores them in the `jsonplaceholder-users` DynamoDB table.
+
+**Lambda Configuration**
+
+| Configuration | Value |
+|---|---|
+| Function name | `lambda-import-users` |
+| Runtime | Python 3.13 |
+| Architecture | ARM64 |
+| Handler | `lambda_function.lambda_handler` |
+| Execution role | `lambda-import-users-role` |
+| Environment variable | `TABLE_NAME=jsonplaceholder-users` |
+| Memory | 128 MB |
+
+**Execution Process**
+
+1. The Lambda function sends an HTTP GET request to JSONPlaceholder.
+2. It receives and validates the JSON user records.
+3. It connects to DynamoDB using the configured execution role.
+4. It inserts each user record using the `PutItem` operation.
+5. It logs the execution results in Amazon CloudWatch.
+
+**Lambda Execution Result**
+
+The first test invocation completed successfully.
+
+| Metric | Result |
+|---|---|
+| Execution status | Succeeded |
+| Response status code | 200 |
+| Records saved | 10 |
+| Execution duration | 954.41 ms |
+| Maximum memory used | 93 MB |
+
+![Successful Lambda execution and response](docs/implementation-screenshots/06-import-lambda-success.png)
+
+**DynamoDB Data Verification**
+
+After execution, I scanned the `jsonplaceholder-users` table and verified that all 10 user records were present.
+
+| Verification | Result |
+|---|---|
+| Items returned | 10 |
+| Items scanned | 10 |
+| Scan efficiency | 100% |
+| Read capacity consumed | 2 RCUs |
+
+![Imported user records in DynamoDB](docs/implementation-screenshots/07-dynamodb-imported-users.png)
+
