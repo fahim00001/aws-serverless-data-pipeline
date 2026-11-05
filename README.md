@@ -41,18 +41,18 @@ Both Lambda Functions
       (Logs & Metrics)
 ```
 
-*This represents the intended architecture. Individual components and automated execution will be documented as they are implemented and verified.*
+_This represents the intended architecture. Individual components and automated execution will be documented as they are implemented and verified._
 
 ## 3. AWS Services Used
 
-| AWS Service | Responsibility |
-|---|---|
-| AWS Lambda | Executes Python functions without managing servers |
-| Amazon DynamoDB | Stores user records |
-| Amazon S3 | Stores JSON export files |
-| IAM | Controls service permissions |
-| EventBridge Scheduler | Triggers recurring backup exports |
-| Amazon CloudWatch | Collects execution logs and metrics |
+| AWS Service           | Responsibility                                     |
+| --------------------- | -------------------------------------------------- |
+| AWS Lambda            | Executes Python functions without managing servers |
+| Amazon DynamoDB       | Stores user records                                |
+| Amazon S3             | Stores JSON export files                           |
+| IAM                   | Controls service permissions                       |
+| EventBridge Scheduler | Triggers recurring backup exports                  |
+| Amazon CloudWatch     | Collects execution logs and metrics                |
 
 ## 4. Repository Structure
 
@@ -94,13 +94,36 @@ Amazon DynamoDB is used as the database layer of this project to store user reco
 
 **Table Configuration**
 
-| Configuration | Value |
-|---|---|
-| Table Name | `jsonplaceholder-users` |
-| Partition Key | `id` |
-| Key Type | Number |
-| Capacity Mode | On-demand |
+| Configuration | Value                   |
+| ------------- | ----------------------- |
+| Table Name    | `jsonplaceholder-users` |
+| Partition Key | `id`                    |
+| Key Type      | Number                  |
+| Capacity Mode | On-demand               |
 
 **Implementation Screenshot**
 
 ![DynamoDB Table Configuration](docs/implementation-screenshots/01-dynamodb_table.png)
+
+### 6.2 Amazon S3 Bucket Creation
+
+Amazon S3 is used as the object storage layer of this project. It will store JSON backup files exported from the DynamoDB table by the second AWS Lambda function.
+
+**Bucket Configuration**
+
+| Configuration       | Value                     |
+| ------------------- | ------------------------- |
+| Bucket Name         | [Your actual bucket name] |
+| AWS Region          | [Your actual AWS Region]  |
+| Bucket Type         | General Purpose           |
+| Block Public Access | Enabled                   |
+
+**Bucket Creation Screenshot**
+
+![S3 Bucket Creation](docs/implementation-screenshots/02-s3-bucket-created.png)
+
+**Security Configuration**
+
+The bucket security settings were configured to prevent public access and protect the stored backup data.
+
+![S3 Security Configuration](docs/implementation-screenshots/03-s3-security-configuration.png)
