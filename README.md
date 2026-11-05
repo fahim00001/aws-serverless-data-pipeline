@@ -113,8 +113,8 @@ Amazon S3 is used as the object storage layer of this project. It will store JSO
 
 | Configuration       | Value                     |
 | ------------------- | ------------------------- |
-| Bucket Name         | [Your actual bucket name] |
-| AWS Region          | [Your actual AWS Region]  |
+| Bucket Name         | jsonplaceholder           |
+| AWS Region          | us west -2                |
 | Bucket Type         | General Purpose           |
 | Block Public Access | Enabled                   |
 
