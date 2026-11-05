@@ -111,12 +111,12 @@ Amazon S3 is used as the object storage layer of this project. It will store JSO
 
 **Bucket Configuration**
 
-| Configuration       | Value                     |
-| ------------------- | ------------------------- |
-| Bucket Name         | jsonplaceholder           |
-| AWS Region          | us west -2                |
-| Bucket Type         | General Purpose           |
-| Block Public Access | Enabled                   |
+| Configuration       | Value           |
+| ------------------- | --------------- |
+| Bucket Name         | jsonplaceholder |
+| AWS Region          | us west -2      |
+| Bucket Type         | General Purpose |
+| Block Public Access | Enabled         |
 
 **Bucket Creation Screenshot**
 
@@ -127,3 +127,29 @@ Amazon S3 is used as the object storage layer of this project. It will store JSO
 The bucket security settings were configured to prevent public access and protect the stored backup data.
 
 ![S3 Security Configuration](docs/implementation-screenshots/03-s3-security-configuration.png)
+
+### 6.3 IAM Execution Role for the Import Lambda
+
+I created `lambda-import-users-role` for the Lambda function that will import user records from JSONPlaceholder into DynamoDB. The function will use this role to access AWS services without storing IAM user access keys in its code.
+
+**Role Configuration**
+
+| Setting                    | Value                          |
+| -------------------------- | ------------------------------ |
+| Role name                  | `lambda-import-users-role`     |
+| Trusted service            | AWS Lambda                     |
+| Logging policy             | `AWSLambdaBasicExecutionRole`  |
+| DynamoDB inline policy     | `lambda-import-putitem-policy` |
+| Allowed DynamoDB operation | `PutItem`                      |
+| Target table               | `jsonplaceholder-users`        |
+| Table Region               | `us-west-2`                    |
+
+The inline policy restricts DynamoDB writes to the `jsonplaceholder-users` table. `PutItem` can create a new record or replace an existing record with the same primary key. The separate logging policy allows the function to write execution logs to CloudWatch Logs.
+
+**Execution Role Screenshot**
+
+![Import Lambda execution role and attached policies](docs/implementation-screenshots/04-lambda-import-role.png)
+
+**DynamoDB Policy Screenshot**
+
+![Inline policy allowing PutItem on the users table](docs/implementation-screenshots/05-lambda-import-policy.png)
