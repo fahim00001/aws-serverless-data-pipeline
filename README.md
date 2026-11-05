@@ -84,3 +84,23 @@ https://jsonplaceholder.typicode.com/users
 
 The API provides sample user records containing information such as names, email addresses, addresses, and company details.
 
+## 6. Implementation Screenshots
+
+This section documents the AWS infrastructure implementation through screenshots captured during the development process.
+
+### 6.1 Amazon DynamoDB Table Creation
+
+Amazon DynamoDB is used as the database layer of this project to store user records retrieved from the JSONPlaceholder REST API.
+
+**Table Configuration**
+
+| Configuration | Value |
+|---|---|
+| Table Name | `jsonplaceholder-users` |
+| Partition Key | `id` |
+| Key Type | Number |
+| Capacity Mode | On-demand |
+
+**Implementation Screenshot**
+
+![DynamoDB Table Configuration](docs/implementation-screenshots/01-dynamodb_table.png)
