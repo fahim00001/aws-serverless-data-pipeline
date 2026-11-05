@@ -301,3 +301,28 @@ Disabling the schedule pauses automatic execution without deleting the Lambda fu
 
 ![EventBridge Scheduler Disabled](docs/implementation-screenshots/11-disabling-eventbridge.png)
 
+## 7. What I Learned from This Project
+
+Through this hands-on project, I gained practical experience integrating multiple AWS services to build a serverless data pipeline.
+
+### Key Technical Skills
+
+- **AWS Lambda:** Created, deployed, and tested Python-based serverless functions.
+- **Amazon DynamoDB:** Learned NoSQL database creation, data insertion using `PutItem`, and data retrieval using `Scan`.
+- **Amazon S3:** Configured object storage and automated JSON file uploads.
+- **AWS IAM:** Created execution roles and custom policies following the principle of least privilege.
+- **EventBridge Scheduler:** Implemented automated Lambda execution using recurring schedules.
+- **Amazon CloudWatch:** Used logs and execution metrics to monitor Lambda functions.
+
+### Practical Experience
+
+- Used Boto3 to interact with AWS services programmatically.
+- Managed environment variables and Lambda configurations.
+- Handled DynamoDB pagination and Decimal-to-JSON conversion.
+- Generated timestamped backup files to avoid overwriting existing objects.
+- Verified automated workflows through AWS Console and execution logs.
+
+### Key Takeaway
+
+Developed a practical understanding of serverless architecture, AWS service integration, IAM security, Python automation, and event-driven computing by building an end-to-end automated data ingestion and backup pipeline.
+
