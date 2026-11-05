@@ -244,3 +244,60 @@ I manually invoked the backup function from the Lambda console. The response and
 I confirmed that the JSON object appeared under `backups/2026-11-05/`. Its filename matches the object path reported by the Lambda execution.
 
 ![JSON export stored in Amazon S3](docs/implementation-screenshots/08-backup-s3-object.png)
+
+### 6.6 Automated Backup Using Amazon EventBridge Scheduler
+
+To automate the backup process, I configured Amazon EventBridge Scheduler to invoke the `lambda-backup-to-s3` function at regular intervals.
+
+Instead of manually triggering the backup Lambda function, EventBridge Scheduler automatically invokes it every two minutes.
+
+**\*\*EventBridge Scheduler Configuration\*\***
+
+| Configuration | Value |
+|---|---|
+| Schedule Name | `backup-users-every-2-minutes` |
+| Schedule Group | `default` |
+| Schedule Type | Recurring |
+| Schedule Expression | `rate(2 minutes)` |
+| Time Zone | `Asia/Dhaka` |
+| Target Service | AWS Lambda |
+| Target Function | `lambda-backup-to-s3` |
+| Payload | `{}` |
+| Flexible Time Window | Off |
+| Schedule Status | Enabled |
+
+**\*\*Scheduler Configuration Screenshot\*\***
+
+![EventBridge Scheduler Configuration](docs/implementation-screenshots/09-eventbridge-schedule.png)
+
+**\*\*Automated Backup Execution\*\***
+
+After enabling the EventBridge schedule, the scheduler automatically invoked the `lambda-backup-to-s3` function every two minutes.
+
+Each invocation scanned the DynamoDB table, retrieved the stored user records, converted them into JSON format, and uploaded a new backup file to the designated S3 bucket.
+
+**\*\*S3 Backup Verification\*\***
+
+I verified the automated backup process by checking the S3 bucket. Multiple timestamped JSON files were successfully generated and stored under the `backups/2026-11-05/` prefix.
+
+The following backup files were generated during the automated execution:
+
+| Execution Time (UTC+06:00) | File Size |
+|---|---|
+| 23:05:34 | 5.5 KB |
+| 23:07:33 | 5.5 KB |
+| 23:09:33 | 5.5 KB |
+| 23:11:33 | 5.5 KB |
+
+![Automated S3 Backup Files](docs/implementation-screenshots/10-backup-with-eventscheduler.png)
+
+**Result:** EventBridge Scheduler successfully automated the backup process, eliminating the need for manual Lambda invocation. Each scheduled execution generated a separate JSON backup file in Amazon S3.
+
+**\*\*Disabling EventBridge Scheduler\*\***
+
+After verifying the automated backup executions, I disabled the EventBridge schedule to stop future scheduled invocations.
+
+Disabling the schedule pauses automatic execution without deleting the Lambda function or previously generated backup files stored in Amazon S3.
+
+![EventBridge Scheduler Disabled](docs/implementation-screenshots/11-disabling-eventbridge.png)
+
